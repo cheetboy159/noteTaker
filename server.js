@@ -18,24 +18,33 @@ app.get("/api/notes", (req, res) => {
 });
 app.get("/api/notes/:id", (req, res) => {
     let savedNotes = JSON.parse(fs.readFileSync("./db/db.json", "utf8"));
-
 });
-
 app.get("*", (req, res) => {
     res.sendFile(path.join(saveNotes, "index.html"));
 });
-
 app.post("/api/notes", (req, res) => {
     let savedNotes = JSON.parse(fs.readFileSync("./db/db.json", "utf8"));
-    let newNote = req.body;
-    let uniqueID = (savedNotes.length).toString();
-    newNote.id = uniqueID;
-    savedNotes.push(newNote);
+    let note = req.body;
+    let ID = (savedNotes.length).toString();
+    note.id = ID;
+    savedNotes.push(note);
     fs.writeFileSync("./db/db.json", JSON.stringify(savedNotes));
-    console.log("Note saved to db.json. Content: ", newNote);
     res.json(savedNotes);
 })
-
+app.delete("/api/notes/:id", (req, res) => {
+    let savedNotes = JSON.parse(fs.readFileSync("./db/db.json", "utf8"));
+    let ID = req.params.id;
+    let incID = 0;
+    savedNotes = savedNotes.filter(currNote => {
+        return currNote.id != ID;
+    })
+    for (currNote of savedNotes) {
+        currNote.id = incID.toString();
+        incID++;
+    }
+    fs.writeFileSync("./db/db.json", JSON.stringify(savedNotes));
+    res.json(savedNotes);
+})
 
 app.listen(port, function () {
     console.log(`Listening on port: ${port}`);
